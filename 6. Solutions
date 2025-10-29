@@ -1,0 +1,23 @@
+-- 1. The operations team wants a quick lookup of newly onboarded customers. Pull a simple list of customers who signed up in 2023, showing their full_name and email.
+select full_name, email
+from customers
+where signup_date >= '2023-01-01' and signup_date <= '2023-12-31';
+
+-- 2. Finance is reviewing cash flows by movement type. They need to know total transaction amount per txn_type (e.g., deposit, withdrawal, fee) to compare volumes.
+select txn_type, sum(amount) as total_amount
+from transactions
+group by txn_type
+order by total_amount desc;
+
+-- 3. Management is evaluating branch performance. For each branch, show branch name, number of active accounts, and the total deposit amount made into accounts at that branch.
+  
+select 
+	b.name as branch_name, 
+    SUM(case when a.status = 'active' then 1 else 0 end) as active_accounts,
+    SUM(case when txn_type = 'deposit' then t.amount else 0 end) as total_deposit
+from branches b 
+join accounts a on b.branch_id = a.branch_id
+join transactions t on a.account_id = t.account_id
+
+group  by branch_name
+order by total_deposit desc, active_accounts desc;
